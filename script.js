@@ -1,7 +1,7 @@
 var character = document.getElementById('character');
 var game = document.getElementById('game');
 var both = 0;
-var xv = 1;
+var xv = 2;
 var yv = 2;
 var yv_b = 0.1;
 var interval;
@@ -11,8 +11,10 @@ var sBlockCounter = 0;
 var drop = 0;
 var betweenHole = 0;
 var randomPosition = [];
-for(let c = 0; c < 25; c++) {
-  randomPosition.push(c);
+for(let i = 0; i < 4; i++) {
+  for (let j = 0; j < 4; j++) {
+    randomPosition.push({'left': (190 - (j-i)*50) + 'px', 'top': (50 + (i+j) * 60) + 'px'});
+  }
 }
 shuffleArray(randomPosition);
 
@@ -43,8 +45,8 @@ function adjacentToHoleLeft () {
     let ihole = document.getElementById('h' + movingBlocks[i]);
     let iholeTop = parseInt(window.getComputedStyle(ihole).getPropertyValue('top'));
     let iholeLeft = parseInt(window.getComputedStyle(ihole).getPropertyValue('left'));
-    let flag1 = Math.abs(iholeTop - characterTop) <= 21;
-    let flag2 = iholeLeft >= characterLeft;
+    let flag1 = Math.abs(iholeTop - characterTop) <= 20;
+    let flag2 = Math.abs(iholeLeft - characterLeft) <= 1;
     if(flag1 && flag2) return true;
   }
   return false;
@@ -56,8 +58,8 @@ function adjacentToHoleRight () {
     let ihole = document.getElementById('h' + movingBlocks[i]);
     let iholeTop = parseInt(window.getComputedStyle(ihole).getPropertyValue('top'));
     let iholeLeft = parseInt(window.getComputedStyle(ihole).getPropertyValue('left'));
-    let flag1 = Math.abs(iholeTop - characterTop) <= 21;
-    let flag2 = iholeLeft + 20 <= characterLeft;
+    let flag1 = Math.abs(iholeTop - characterTop) <= 20;
+    let flag2 = Math.abs(iholeLeft + 20 - characterLeft) <= 1;
     if(flag1 && flag2) return true;
   }
   return false;
@@ -134,7 +136,7 @@ var createMovingBlocks = setInterval(function () {
       ihole.remove();
     }
 
-    if (iblockTop_int + 20 > characterTop_int && iblockTop_int - 20 < characterTop_int) {
+    if (iblockTop_int + 20 >= characterTop_int && iblockTop_int - 20 <= characterTop_int) {
       drop++;
       if (iholeLeft_int <= characterLeft_int && iholeLeft_int + 20 >= characterLeft_int) {
         drop = 0;
@@ -151,7 +153,28 @@ var createMovingBlocks = setInterval(function () {
 
 }, 1);
 
-// var createStaticBlocks = setInterval(function () {
-//   return;
-// }, 1);
+var createStaticBlocks = setInterval(function () {
+  if (sBlockCounter == 14) {
+    clearInterval(createStaticBlocks);
+  }
+  let sBlock = document.createElement('div');
+  let wBlock = document.createElement('div');
+  let appendStaticBlock = setTimeout(() => {
+    wBlock.remove();
+    game.appendChild(sBlock);
+    sBlockCounter++;
+  }, 10000);
+  let appendWarningBlock = setTimeout(() => {
+    let pos = randomPosition.pop();
+    sBlock.setAttribute('class', 'staticBlock');
+    sBlock.setAttribute('id', 's' + sBlockCounter);
+    wBlock.setAttribute('class', 'staticBlock');
+    wBlock.setAttribute('id', 'w' + sBlockCounter);
+    sBlock.style.left = wBlock.style.left = pos['left'];
+    sBlock.style.top = wBlock.style.top = pos['top'];
 
+    wBlock.style.animation = 'blink 500ms linear 4 alternate';
+
+    game.appendChild(wBlock);
+  }, 8000);
+}, 10000);
