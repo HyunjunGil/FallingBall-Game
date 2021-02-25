@@ -10,6 +10,7 @@ var mBlockCounter = 0;
 var sBlockCounter = 0;
 var drop = 0;
 var betweenHole = 0;
+
 var randomPosition = [];
 for(let i = 0; i < 4; i++) {
   for (let j = 0; j < 4; j++) {
@@ -27,17 +28,18 @@ function shuffleArray(array) {
 
 function moveLeft () {
   let left = parseFloat(window.getComputedStyle(character).getPropertyValue('left'));
-  if (left > 0 && !adjacentToHoleLeft()) {
+  if (left > 0 && !adjacentToHoleLeft() && !adjacentToStaticBlockRight()) {
     character.style.left = (left - xv) + 'px';
   }
 }
 function moveRight () {
   let left = parseFloat(window.getComputedStyle(character).getPropertyValue('left'));
-  if (left < 380 && !adjacentToHoleRight()) {
+  if (left < 380 && !adjacentToHoleRight() && !adjacentToStaticBlockLeft()) {
     character.style.left = (left + xv) + 'px';
   }
 }
 
+//createMovingBlocks에 포함시킬 수 있지 않을까? 
 function adjacentToHoleLeft () {
   let characterLeft = parseInt(window.getComputedStyle(character).getPropertyValue('left'));
   let characterTop = parseInt(window.getComputedStyle(character).getPropertyValue('top'));
@@ -63,6 +65,36 @@ function adjacentToHoleRight () {
     if(flag1 && flag2) return true;
   }
   return false;
+}
+
+function adjacentToStaticBlockLeft () {
+  let characterLeft = parseInt(window.getComputedStyle(character).getPropertyValue('left'));
+  let characterTop = parseInt(window.getComputedStyle(character).getPropertyValue('top'));
+  for (let i = 0; i < sBlockCounter; i++) {
+    let sBlock = document.getElementById('s' + i);
+    let sBlockTop = parseInt(window.getComputedStyle(sBlock).getPropertyValue('top'));
+    let sBlockLeft = parseInt(window.getComputedStyle(sBlock).getPropertyValue('left'));
+    let flag1 = Math.abs(sBlockTop + 15 - characterTop) <= 35;
+    let flag2 = Math.abs(sBlockLeft - characterLeft - 20) <= 1;
+    if (flag1 && flag2) return true;
+  }
+  return false;
+}
+function adjacentToStaticBlockRight () {
+  let characterLeft = parseInt(window.getComputedStyle(character).getPropertyValue('left'));
+  let characterTop = parseInt(window.getComputedStyle(character).getPropertyValue('top'));
+  for (let i = 0; i < sBlockCounter; i++) {
+    let sBlock = document.getElementById('s' + i);
+    let sBlockTop = parseInt(window.getComputedStyle(sBlock).getPropertyValue('top'));
+    let sBlockLeft = parseInt(window.getComputedStyle(sBlock).getPropertyValue('left'));
+    let flag1 = Math.abs(sBlockTop + 15 - characterTop) <= 35;
+    let flag2 = Math.abs(sBlockLeft + 20 - characterLeft) <= 1;
+    if (flag1 && flag2) return true;
+  }
+  return false;
+}
+function onStaticBlock () {
+
 }
 
 document.addEventListener('keydown', event => {
@@ -159,12 +191,12 @@ var createStaticBlocks = setInterval(function () {
   }
   let sBlock = document.createElement('div');
   let wBlock = document.createElement('div');
-  let appendStaticBlock = setTimeout(() => {
+  setTimeout(() => {
     wBlock.remove();
     game.appendChild(sBlock);
     sBlockCounter++;
   }, 10000);
-  let appendWarningBlock = setTimeout(() => {
+  setTimeout(() => {
     let pos = randomPosition.pop();
     sBlock.setAttribute('class', 'staticBlock');
     sBlock.setAttribute('id', 's' + sBlockCounter);
