@@ -1,0 +1,60 @@
+#scoreBoard {
+  position: absolute;
+  width: 800px;
+  height: 500px;
+  top: 100px;
+  left: 600px;
+  border: 3px solid black;
+
+}
+
+p {
+  text-align: center;
+  font-size: 50px;
+}
+.highscore-p {
+  text-align: center;
+}
+
+#highScoreInfo {
+  margin-top: 50px;
+  font-size: 30px;
+}
+
+#scoreSpan {
+  font-size: 50px;
+}
+
+#highScore {
+  margin: auto;
+  border: 1px solid;
+  width: 500px;
+  height: 200px;
+  margin-top: 50px;
+}
+
+#first-row {
+  width : 50px;
+  height: 20px;
+  text-align: center;
+}
+
+#second-row {
+  width :50px;
+  height: 20px;
+  text-align: center;
+}
+
+#third-row {
+  width: 100px;
+  height: 20px;
+  text-align: center;
+}
+
+td {
+  text-align: center;
+}
+
+th {
+  font-size: 20px;
+}

@@ -4,11 +4,53 @@
   <meta charset = 'UTF-8'>
   <title>Falling Ball</title>
   <link rel = 'stylesheet' href = "style.css">
+  <link rel = 'stylesheet' href = "style_highscore.css">
 </head>
 <body>
   <div id = "game">
     <div id = "character"></div>
   </div>
+  <div id = "scoreBoard">
+    <p>Score: <span id = "scoreSpan" class = "highscore-p">0</span></p>
+    <p id = "highScoreInfo" class = "highscore-p">Top 5 Highscores</p>
+    <table id = "highScore">
+      <tr>
+        <th id = "first-row">Rank</th>
+        <th id = "second-row">Score</th>
+        <th id = "third-row">Time</th>
+      </tr>
+      <tbody id = "tableContents">
+        <tr id = "row1">
+          <td>1</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr id = "row2">
+          <td>2</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr id = "row3">
+          <td>3</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr id = "row4">
+          <td>4</td>
+          <td></td>
+          <td></td>
+        </tr>
+        <tr id = "row5">
+          <td>5</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p id = "description">Press Enter to start</p>
+  
 </body>
 <script src = "script.js"></script>
+<script src = "highscore.js"></script>
 </html>

@@ -9,11 +9,12 @@ html, body {
 }
 
 #game {
-  position: relative;
+  position: absolute;
   width: 400px;
   height: 500px;
   border: 1px solid black;
-  margin: auto;
+  top: 100px;
+  left: 100px;
   overflow: hidden;
 }
 

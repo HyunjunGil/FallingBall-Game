@@ -1,9 +1,9 @@
 var character = document.getElementById('character');
 var game = document.getElementById('game');
 var both = 0;
-var xv = 2;
+var xv = 1.5;
 var yv = 2;
-var yv_b = 0.1;
+var yv_b = 0.5;
 var interval;
 var movingBlocks = [];
 var mBlockCounter = 0;
@@ -94,7 +94,31 @@ function adjacentToStaticBlockRight () {
   return false;
 }
 function onStaticBlock () {
+  let characterLeft = parseInt(window.getComputedStyle(character).getPropertyValue('left'));
+  let characterTop = parseInt(window.getComputedStyle(character).getPropertyValue('top'));
+  for (let i = 0; i < sBlockCounter; i++) {
+    let sBlock = document.getElementById('s' + i);
+    let sBlockTop = parseInt(window.getComputedStyle(sBlock).getPropertyValue('top'));
+    let sBlockLeft = parseInt(window.getComputedStyle(sBlock).getPropertyValue('left'));
+    let flag1 = Math.abs(sBlockLeft - characterLeft) <= 20;
+    let flag2 = Math.abs(sBlockTop - characterTop - 20) <= 1;
+    if (flag1 && flag2) return true;
+  }
+  return false;
+}
 
+function betweenMovingAndStatic () {
+  let characterLeft = parseInt(window.getComputedStyle(character).getPropertyValue('left'));
+  let characterTop = parseInt(window.getComputedStyle(character).getPropertyValue('top'));
+  for (let i = 0; i < sBlockCounter; i++) {
+    let sBlock = document.getElementById('s' + i);
+    let sBlockTop = parseInt(window.getComputedStyle(sBlock).getPropertyValue('top'));
+    let sBlockLeft = parseInt(window.getComputedStyle(sBlock).getPropertyValue('left'));
+    let flag1 = Math.abs(sBlockLeft - characterLeft) <= 19;
+    let flag2 = Math.abs(sBlockTop + 50 - characterTop) == 0;
+    if (flag1 && flag2) return true;
+  }
+  return false;
 }
 
 document.addEventListener('keydown', event => {
@@ -147,7 +171,7 @@ var createMovingBlocks = setInterval(function () {
   var characterLeft_int = parseInt(characterLeft);
 
 
-  if (characterTop < 0) {
+  if (characterTop < 0 || betweenMovingAndStatic()) {
     clearInterval(createMovingBlocks);
     alert('Game over. Score: ' + (mBlockCounter - 5));
     location.reload();
@@ -175,7 +199,7 @@ var createMovingBlocks = setInterval(function () {
       }
     }
   }
-  if (drop == 0) {
+  if (drop == 0 && !onStaticBlock()) {
     if (characterTop < 480) {
       character.style.top = (characterTop + yv) + 'px'; 
     }
