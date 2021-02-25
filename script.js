@@ -1,3 +1,39 @@
+class ScoreInfo {
+  constructor (score) {
+    this.score = score;
+    this.time = new Date();
+  }
+}
+
+var rankers = new Map();
+for(let i = 1; i < 6; i++){
+  rankers.set(i, undefined);
+}
+
+function updateHighscore(score) {
+  let result = new ScoreInfo(score);
+  let i = 5;
+  while (i > 0) {
+    if (rankers.get(i) === undefined || rankers.get(i).score <= result.score) {
+      i--;
+    } else break;
+  }
+  i++;
+  let j = 4;
+  while (j >= i) {
+    rankers.set(j+1, rankers.get(j));
+    j--;
+  }
+  rankers.set(i, result);
+  for (let i = 1; i < 6; i++) {
+    if (rankers.get(i) === undefined) {
+      break;
+    }
+    document.getElementById('row' + i).innerHTML = 
+      `<td>${i}</td><td>${rankers.get(i).score}</td><td>${rankers.get(i).time}</td>`
+  }
+}
+
 var character = document.getElementById('character');
 var game = document.getElementById('game');
 var both = 0;
@@ -10,14 +46,34 @@ var mBlockCounter = 0;
 var sBlockCounter = 0;
 var drop = 0;
 var betweenHole = 0;
+var onGame = false;
+var startGame_movingBlocks;
+var startGame_staticBlocks;
 
-var randomPosition = [];
-for(let i = 0; i < 4; i++) {
-  for (let j = 0; j < 4; j++) {
-    randomPosition.push({'left': (190 - (j-i)*50) + 'px', 'top': (50 + (i+j) * 60) + 'px'});
+var randomPosition;
+
+function initializeGame() {
+  character.style.top = 50 + 'px';
+  character.style.left = 190 + 'px';
+  clearBlocks();
+  xv = 1.5;
+  yv = 2;
+  yv_b = 0.5;
+  movingBlocks = [];
+  mBlockCounter = sBlockCounter = drop = betweenHole = 0;
+  console.log(mBlockCounter, sBlockCounter, drop, betweenHole);
+  randomPosition = [];
+  for(let i = 0; i < 4; i++) {
+    for (let j = 0; j < 4; j++) {
+      randomPosition.push({'left': (190 - (j-i)*50) + 'px', 'top': (50 + (i+j) * 60) + 'px'});
+    }
   }
+  shuffleArray(randomPosition);
+
+  onGame = true;
+  startGame_movingBlocks = setInterval(createMovingBlocks, 1);
+  startGame_staticBlocks = setInterval(createStaticBlocks, 10000);
 }
-shuffleArray(randomPosition);
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -121,14 +177,30 @@ function betweenMovingAndStatic () {
   return false;
 }
 
+function clearBlocks () {
+  for (let i = 0; i < movingBlocks.length; i++) {
+    document.getElementById('m' + movingBlocks[i]).remove();
+    document.getElementById('h' + movingBlocks[i]).remove();
+  }
+  for (i = 0; i < 16; i++) {
+    let sBlock = document.getElementById('s' + i);
+    if (sBlock !== null) {
+      sBlock.remove();
+    }
+  }
+}
+
 document.addEventListener('keydown', event => {
-  if (both == 0) {
+  if (onGame && both == 0) {
     both++;
     if (event.key === 'ArrowLeft') {
       interval = setInterval(moveLeft, 1);
     } else if (event.key === 'ArrowRight') {
       interval = setInterval(moveRight, 1);
     }
+  }
+  if (!onGame && event.key === 'Enter') {
+    initializeGame();
   }
 });
 
@@ -137,7 +209,7 @@ document.addEventListener('keyup', () => {
   both = 0;
 })
 
-var createMovingBlocks = setInterval(function () {
+function createMovingBlocks () {
   var i = 0;
   var mLast = document.getElementById('m' + (mBlockCounter - 1));
   var hLast = document.getElementById('h' + (mBlockCounter - 1));
@@ -172,10 +244,17 @@ var createMovingBlocks = setInterval(function () {
 
 
   if (characterTop < 0 || betweenMovingAndStatic()) {
-    clearInterval(createMovingBlocks);
-    alert('Game over. Score: ' + (mBlockCounter - 5));
-    location.reload();
+    clearInterval(startGame_movingBlocks);
+    clearInterval(startGame_staticBlocks);
+    let score = mBlockCounter - 5;
+    alert('Game over. Score: ' + score);
+    document.getElementById('scoreSpan').innerHTML = 0;
+    updateHighscore(score);
+    onGame = false;
+    return;
   }
+  console.log(mBlockCounter);
+  document.getElementById('scoreSpan').innerHTML = mBlockCounter > 5 ? mBlockCounter - 5 : 0;
 
   for(i = 0;i < movingBlocks.length; i++) {
     let iblock = document.getElementById('m' + movingBlocks[i]);
@@ -207,9 +286,9 @@ var createMovingBlocks = setInterval(function () {
     character.style.top = (characterTop - yv_b) + 'px';
   }
 
-}, 1);
+}
 
-var createStaticBlocks = setInterval(function () {
+function createStaticBlocks() {
   if (sBlockCounter == 14) {
     clearInterval(createStaticBlocks);
   }
@@ -233,4 +312,4 @@ var createStaticBlocks = setInterval(function () {
 
     game.appendChild(wBlock);
   }, 8000);
-}, 10000);
+}
