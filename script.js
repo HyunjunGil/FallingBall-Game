@@ -49,6 +49,8 @@ var betweenHole = 0;
 var onGame = false;
 var startGame_movingBlocks;
 var startGame_staticBlocks;
+var addStaticBlocks_timer;
+var setStaticBlockPosition_timer;
 
 var randomPosition;
 
@@ -246,6 +248,8 @@ function createMovingBlocks () {
   if (characterTop < 0 || betweenMovingAndStatic()) {
     clearInterval(startGame_movingBlocks);
     clearInterval(startGame_staticBlocks);
+    clearTimeout(addStaticBlocks_timer);
+    clearTimeout(setStaticBlockPosition_timer);
     let score = mBlockCounter - 5;
     alert('Game over. Score: ' + score);
     document.getElementById('scoreSpan').innerHTML = 0;
@@ -294,22 +298,26 @@ function createStaticBlocks() {
   }
   let sBlock = document.createElement('div');
   let wBlock = document.createElement('div');
-  setTimeout(() => {
-    wBlock.remove();
-    game.appendChild(sBlock);
-    sBlockCounter++;
-  }, 10000);
-  setTimeout(() => {
-    let pos = randomPosition.pop();
-    sBlock.setAttribute('class', 'staticBlock');
-    sBlock.setAttribute('id', 's' + sBlockCounter);
-    wBlock.setAttribute('class', 'staticBlock');
-    wBlock.setAttribute('id', 'w' + sBlockCounter);
-    sBlock.style.left = wBlock.style.left = pos['left'];
-    sBlock.style.top = wBlock.style.top = pos['top'];
+  addStaticBlocks_timer = setTimeout(addStaticBlocks, 10000, wBlock, sBlock);
+  setStaticBlockPosition_timer = setTimeout(setStaticBlockPosition, 8000, wBlock, sBlock);
+}
 
-    wBlock.style.animation = 'blink 500ms linear 4 alternate';
+function addStaticBlocks (wBlock, sBlock) {
+ wBlock.remove();
+ game.appendChild(sBlock);
+ sBlockCounter++; 
+}
 
-    game.appendChild(wBlock);
-  }, 8000);
+function setStaticBlockPosition (wBlock, sBlock) {
+  let pos = randomPosition.pop();
+  sBlock.setAttribute('class', 'staticBlock');
+  sBlock.setAttribute('id', 's' + sBlockCounter);
+  wBlock.setAttribute('class', 'staticBlock');
+  wBlock.setAttribute('id', 'w' + sBlockCounter);
+  sBlock.style.left = wBlock.style.left = pos['left'];
+  sBlock.style.top = wBlock.style.top = pos['top'];
+
+  wBlock.style.animation = 'blink 500ms linear 4 alternate';
+
+  game.appendChild(wBlock);
 }
