@@ -3,13 +3,13 @@ var game = document.getElementById('game');
 var both = 0;
 var xv = 1;
 var yv = 2;
-var yv_b = 1;
+var yv_b = 0.1;
 var interval;
 var movingBlocks = [];
 var mBlockCounter = 0;
 var sBlockCounter = 0;
 var drop = 0;
-var betweenHole = false;
+var betweenHole = 0;
 var randomPosition = [];
 for(let c = 0; c < 25; c++) {
   randomPosition.push(c);
@@ -25,15 +25,42 @@ function shuffleArray(array) {
 
 function moveLeft () {
   let left = parseFloat(window.getComputedStyle(character).getPropertyValue('left'));
-  if (left > 0) {
+  if (left > 0 && !adjacentToHoleLeft()) {
     character.style.left = (left - xv) + 'px';
   }
 }
 function moveRight () {
   let left = parseFloat(window.getComputedStyle(character).getPropertyValue('left'));
-  if (left < 380) {
+  if (left < 380 && !adjacentToHoleRight()) {
     character.style.left = (left + xv) + 'px';
   }
+}
+
+function adjacentToHoleLeft () {
+  let characterLeft = parseInt(window.getComputedStyle(character).getPropertyValue('left'));
+  let characterTop = parseInt(window.getComputedStyle(character).getPropertyValue('top'));
+  for (let i = 0; i < movingBlocks.length; i++) {
+    let ihole = document.getElementById('h' + movingBlocks[i]);
+    let iholeTop = parseInt(window.getComputedStyle(ihole).getPropertyValue('top'));
+    let iholeLeft = parseInt(window.getComputedStyle(ihole).getPropertyValue('left'));
+    let flag1 = Math.abs(iholeTop - characterTop) <= 21;
+    let flag2 = iholeLeft >= characterLeft;
+    if(flag1 && flag2) return true;
+  }
+  return false;
+}
+function adjacentToHoleRight () {
+  let characterLeft = parseInt(window.getComputedStyle(character).getPropertyValue('left'));
+  let characterTop = parseInt(window.getComputedStyle(character).getPropertyValue('top'));
+  for (let i = 0; i < movingBlocks.length; i++) {
+    let ihole = document.getElementById('h' + movingBlocks[i]);
+    let iholeTop = parseInt(window.getComputedStyle(ihole).getPropertyValue('top'));
+    let iholeLeft = parseInt(window.getComputedStyle(ihole).getPropertyValue('left'));
+    let flag1 = Math.abs(iholeTop - characterTop) <= 21;
+    let flag2 = iholeLeft + 20 <= characterLeft;
+    if(flag1 && flag2) return true;
+  }
+  return false;
 }
 
 document.addEventListener('keydown', event => {
@@ -82,6 +109,9 @@ var createMovingBlocks = setInterval(function () {
 
   var characterTop = parseFloat(window.getComputedStyle(character).getPropertyValue('top'));
   var characterLeft = parseFloat(window.getComputedStyle(character).getPropertyValue('left'));
+  var characterTop_int = parseInt(characterTop);
+  var characterLeft_int = parseInt(characterLeft);
+
 
   if (characterTop < 0) {
     clearInterval(createMovingBlocks);
@@ -94,6 +124,8 @@ var createMovingBlocks = setInterval(function () {
     let ihole = document.getElementById('h' + movingBlocks[i]);
     let iblockTop = parseFloat(window.getComputedStyle(iblock).getPropertyValue('top'));
     let iholeLeft = parseFloat(window.getComputedStyle(ihole).getPropertyValue('left'));
+    let iblockTop_int = parseInt(iblockTop);
+    let iholeLeft_int = parseInt(iholeLeft);
     iblock.style.top = ihole.style.top = (iblockTop - yv_b) + 'px';
     
     if (iblockTop < -20) {
@@ -102,9 +134,9 @@ var createMovingBlocks = setInterval(function () {
       ihole.remove();
     }
 
-    if (iblockTop > characterTop && iblockTop - 20 < characterTop) {
+    if (iblockTop_int + 20 > characterTop_int && iblockTop_int - 20 < characterTop_int) {
       drop++;
-      if (iholeLeft < characterLeft && iholeLeft + 20 > characterLeft) {
+      if (iholeLeft_int <= characterLeft_int && iholeLeft_int + 20 >= characterLeft_int) {
         drop = 0;
       }
     }
