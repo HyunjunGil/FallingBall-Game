@@ -5,6 +5,7 @@
   <title>Falling Ball</title>
   <link rel = 'stylesheet' href = "style.css">
   <link rel = 'stylesheet' href = "style_highscore.css">
+  <link rel = 'stylesheet' href = "style_option.css">
 </head>
 <body>
   <div id = "game">
@@ -13,6 +14,10 @@
   <div id = "scoreBoard">
     <p>Score: <span id = "scoreSpan" class = "highscore-p">0</span></p>
     <p id = "highScoreInfo" class = "highscore-p">Top 5 Highscores</p>
+    <div id = "buttonBox">
+      <input id = "blind" class = "option" type = "checkbox">Blind</input>
+      <input id = "accelerate" class = "option" type = "checkbox">Accelerate</input>
+    </div>
     <table id = "highScore">
       <tr>
         <th id = "first-row">Rank</th>

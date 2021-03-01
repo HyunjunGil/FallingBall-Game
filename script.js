@@ -6,52 +6,76 @@ class ScoreInfo {
 }
 
 var rankers = new Map();
-for(let i = 1; i < 6; i++){
-  rankers.set(i, JSON.parse(localStorage.getItem(i)));
-}
-//화면 업데이트
-for (let i = 1; i < 6; i++) {
-  if (rankers.get(i) === null) {
-    break;
-  }
-  document.getElementById('row' + i).innerHTML = 
-    `<td>${i}</td><td>${rankers.get(i).score}</td><td>${rankers.get(i).time}</td>`
-}
+renderScoreBoard();
 
-function updateHighscore(score) {
-  let result = new ScoreInfo(score);
-  let i = 5;
-  //5등부터 점수를 확인하며 순위를 찾아감
-  while (i > 0) {
-    if (rankers.get(i) === null || rankers.get(i).score <= result.score) {
-      i--;
-    } else break;
+function renderScoreBoard (str = "n") {
+  console.log(str);
+  for(let i = 1; i < 6; i++){
+    rankers.set(i, JSON.parse(localStorage.getItem(str + i)));
+    console.log('here', rankers.get(i));
   }
-  i++;
-  //이 시점에서 i가 현재 등수
-  let j = 4;
-  
-  //등수 조정 및 local storage 업데이트
-  while (j >= i) {
-    rankers.set(j+1, rankers.get(j));
-    localStorage.setItem(j+1, JSON.stringify(rankers.get(j)));
-    j--;
-  }
-  rankers.set(i, result);
-  localStorage.setItem(i, JSON.stringify(result));
-
   //화면 업데이트
   for (let i = 1; i < 6; i++) {
     if (rankers.get(i) === null) {
-      break;
+      document.getElementById('row' + i).innerHTML = `<td>${i}</td><td></td><td></td>`;
+    } else {
+      document.getElementById('row' + i).innerHTML = 
+        `<td>${i}</td><td>${rankers.get(i).score}</td><td>${rankers.get(i).time}</td>`;
     }
-    document.getElementById('row' + i).innerHTML = 
-      `<td>${i}</td><td>${rankers.get(i).score}</td><td>${rankers.get(i).time}</td>`
   }
+}
+
+function updateHighscore(score) {
+  let str = "";
+  if (flagSpeedup && flagBlind) {
+    str = "bs";
+  } else if (flagSpeedup && !flagBlind) {
+    str = "s";
+  } else if (!flagSpeedup && flagBlind) {
+    str = "b";
+  } else {
+    str = "n";
+  }
+  if (score === undefined) {
+    renderScoreBoard(str);
+  } else {
+    let result = new ScoreInfo(score);
+    let i = 5;
+    //5등부터 점수를 확인하며 순위를 찾아감
+    while (i > 0) {
+      if (rankers.get(i) === null || rankers.get(i).score <= result.score) {
+        i--;
+      } else break;
+    }
+    i++;
+    //이 시점에서 i가 현재 등수
+    let j = 4;
+    
+    //등수 조정 및 local storage 업데이트
+    while (j >= i) {
+      rankers.set(j+1, rankers.get(j));
+      localStorage.setItem(str + (j+1), JSON.stringify(rankers.get(j)));
+      j--;
+    }
+    rankers.set(i, result);
+    localStorage.setItem(str + i, JSON.stringify(result));
+
+    //화면 업데이트
+    for (let i = 1; i < 6; i++) {
+      if (rankers.get(i) === null) {
+        break;
+      }
+      document.getElementById('row' + i).innerHTML = 
+        `<td>${i}</td><td>${rankers.get(i).score}</td><td>${rankers.get(i).time}</td>`
+    }
+  }
+  
 }
 
 var character = document.getElementById('character');
 var game = document.getElementById('game');
+var blind = document.getElementById('blind');
+var accelerate = document.getElementById('accelerate');
 var both = 0;
 var xv = 1.5;
 var yv = 2;
@@ -68,11 +92,12 @@ var startGame_staticBlocks;
 var addStaticBlocks_timer;
 var setStaticBlockPosition_timer;
 
+var flagSpeedup = false;
+var flagBlind = false;
+
 var randomPosition;
 
-window.onload = function () {
 
-}
 
 function initializeGame() {
   character.style.top = 50 + 'px';
@@ -229,6 +254,26 @@ document.addEventListener('keydown', event => {
 document.addEventListener('keyup', () => {
   clearInterval(interval);
   both = 0;
+})
+
+blind.addEventListener('click', event => {
+  if (onGame) return;
+  if (event.target.checked) {
+    flagBlind = true;
+  } else {
+    flagBlind = false;
+  }
+  updateHighscore();
+})
+
+accelerate.addEventListener('click', event => {
+  if (onGame) return;
+  if (event.target.checked) {
+    flagSpeedup = true;
+  } else {
+    flagSpeedup = false;
+  }
+  updateHighscore();
 })
 
 function createMovingBlocks () {
