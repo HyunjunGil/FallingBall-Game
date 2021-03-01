@@ -7,26 +7,42 @@ class ScoreInfo {
 
 var rankers = new Map();
 for(let i = 1; i < 6; i++){
-  rankers.set(i, undefined);
+  rankers.set(i, JSON.parse(localStorage.getItem(i)));
+}
+//화면 업데이트
+for (let i = 1; i < 6; i++) {
+  if (rankers.get(i) === null) {
+    break;
+  }
+  document.getElementById('row' + i).innerHTML = 
+    `<td>${i}</td><td>${rankers.get(i).score}</td><td>${rankers.get(i).time}</td>`
 }
 
 function updateHighscore(score) {
   let result = new ScoreInfo(score);
   let i = 5;
+  //5등부터 점수를 확인하며 순위를 찾아감
   while (i > 0) {
-    if (rankers.get(i) === undefined || rankers.get(i).score <= result.score) {
+    if (rankers.get(i) === null || rankers.get(i).score <= result.score) {
       i--;
     } else break;
   }
   i++;
+  //이 시점에서 i가 현재 등수
   let j = 4;
+  
+  //등수 조정 및 local storage 업데이트
   while (j >= i) {
     rankers.set(j+1, rankers.get(j));
+    localStorage.setItem(j+1, JSON.stringify(rankers.get(j)));
     j--;
   }
   rankers.set(i, result);
+  localStorage.setItem(i, JSON.stringify(result));
+
+  //화면 업데이트
   for (let i = 1; i < 6; i++) {
-    if (rankers.get(i) === undefined) {
+    if (rankers.get(i) === null) {
       break;
     }
     document.getElementById('row' + i).innerHTML = 
@@ -53,6 +69,10 @@ var addStaticBlocks_timer;
 var setStaticBlockPosition_timer;
 
 var randomPosition;
+
+window.onload = function () {
+
+}
 
 function initializeGame() {
   character.style.top = 50 + 'px';
