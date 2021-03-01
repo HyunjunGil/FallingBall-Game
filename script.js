@@ -90,6 +90,7 @@ var startGame_staticBlocks;
 var addStaticBlocks_timer;
 var setStaticBlockPosition_timer;
 
+var accel_interval;
 var flagSpeedup = false;
 var flagBlind = false;
 
@@ -117,7 +118,12 @@ function initializeGame() {
   onGame = true;
   startGame_movingBlocks = setInterval(createMovingBlocks, 1);
   startGame_staticBlocks = setInterval(createStaticBlocks, 10000);
+  if (flagSpeedup) {
+    accel_interval = setInterval(accelerateGame, 8000);
+  }
+  
 }
+
 
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -277,6 +283,7 @@ function createMovingBlocks () {
   var i = 0;
   var mLast = document.getElementById('m' + (mBlockCounter - 1));
   var hLast = document.getElementById('h' + (mBlockCounter - 1));
+
   if (mBlockCounter > 0) {
     var mLastTop = parseFloat(window.getComputedStyle(mLast).getPropertyValue('top'));
     var hLastTop = parseFloat(window.getComputedStyle(hLast).getPropertyValue('top'));
@@ -312,6 +319,9 @@ function createMovingBlocks () {
     clearInterval(startGame_staticBlocks);
     clearTimeout(addStaticBlocks_timer);
     clearTimeout(setStaticBlockPosition_timer);
+    if (flagSpeedup) {
+      clearInterval(accel_interval);
+    }
     let score = mBlockCounter - 5;
     alert('Game over. Score: ' + score);
     document.getElementById('scoreSpan').innerHTML = 0;
@@ -377,8 +387,16 @@ function setStaticBlockPosition (wBlock, sBlock) {
   wBlock.setAttribute('id', 'w' + sBlockCounter);
   sBlock.style.left = wBlock.style.left = pos['left'];
   sBlock.style.top = wBlock.style.top = pos['top'];
-
+  if (flagBlind) {
+    sBlock.style.backgroundColor = 'white';
+  }
   wBlock.style.animation = 'blink 500ms linear 4 alternate';
 
   game.appendChild(wBlock);
+}
+
+function accelerateGame () {
+  xv += 0.1;
+  yv += 0.1;
+  yv_b += 0.1;
 }
