@@ -9,10 +9,8 @@ var rankers = new Map();
 renderScoreBoard();
 
 function renderScoreBoard (str = "n") {
-  console.log(str);
   for(let i = 1; i < 6; i++){
     rankers.set(i, JSON.parse(localStorage.getItem(str + i)));
-    console.log('here', rankers.get(i));
   }
   //화면 업데이트
   for (let i = 1; i < 6; i++) {
@@ -108,7 +106,6 @@ function initializeGame() {
   yv_b = 0.5;
   movingBlocks = [];
   mBlockCounter = sBlockCounter = drop = betweenHole = 0;
-  console.log(mBlockCounter, sBlockCounter, drop, betweenHole);
   randomPosition = [];
   for(let i = 0; i < 4; i++) {
     for (let j = 0; j < 4; j++) {
@@ -322,7 +319,6 @@ function createMovingBlocks () {
     onGame = false;
     return;
   }
-  console.log(mBlockCounter);
   document.getElementById('scoreSpan').innerHTML = mBlockCounter > 5 ? mBlockCounter - 5 : 0;
 
   for(i = 0;i < movingBlocks.length; i++) {
